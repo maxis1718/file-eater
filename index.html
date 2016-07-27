@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>File eater</title>
+</head>
+<body>
+    <form id="uploadForm" enctype="multipart/form-data" action="/api/photo" method="post">
+        <input type="file" name="userPhoto" />
+        <input type="submit" value="Upload Image" name="submit">
+    </form>
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+    <script type="text/javascript">
+
+        var API_PATH = '/api/photo';
+
+        var fileEater = {
+
+            getForm: function(formElement){
+                var formElement = document.querySelector(formElement);
+                var formData = new FormData(formElement);
+                return formData;
+            },
+
+            upload: function(formData, callback) {
+
+                var request = new XMLHttpRequest();
+
+                request.onreadystatechange = function() {
+                    if (request.readyState == 4 && request.status == 200) {
+                        callback(request.responseText);
+                    }
+                };
+
+                request.open("POST", API_PATH);
+                request.send(formData);
+            },
+            process: function(responseText) {
+                // callback for "file uploaded"
+                var res = JSON.parse(responseText);
+                console.log('>>> res:', res);
+                console.log('>>> fileName:', res.filename);
+            }
+        };
+
+
+        $(document).ready(function(){
+            $('#uploadForm').submit(function(e){
+                e.preventDefault();
+                var formData = fileEater.getForm('#uploadForm');
+                fileEater.upload(formData, fileEater.process);
+            });
+        });
+    </script>
+</body>
+</html>
